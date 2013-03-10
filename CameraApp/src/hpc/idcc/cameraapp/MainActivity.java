@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,8 +14,10 @@ import android.widget.Toast;
 public class MainActivity extends Activity implements OnClickListener {
 
     private final static int AR_IMAGE_FROM_CAMERA = 1;
+    private final static int AR_IMAGE_FROM_CAMERA_PREVIEW = 2;
     
     private Button mButtonViaIntent;
+    private Button mButtonCameraFeature;
     private Uri cameraOutputUri;
     
     @Override
@@ -26,6 +27,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
         mButtonViaIntent = (Button) findViewById(R.id.main_button_intent);
         mButtonViaIntent.setOnClickListener(this);
+
+        mButtonCameraFeature = (Button) findViewById(R.id.main_button_camera_feature);
+        mButtonCameraFeature.setOnClickListener(this);
     }
 
     @Override
@@ -46,7 +50,6 @@ public class MainActivity extends Activity implements OnClickListener {
                 Toast.makeText(this, "Oops! Some errors occur!!", Toast.LENGTH_LONG).show();
             }
             break;
-
         default:
             break;
         }
@@ -62,6 +65,9 @@ public class MainActivity extends Activity implements OnClickListener {
             cameraOutputUri = PictureFiles.getOutputMediaFileUri(
                     PictureFiles.MEDIA_TYPE_IMAGE);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraOutputUri);
+            break;
+        case R.id.main_button_camera_feature:
+            intent = new Intent(this, CameraPreview.class);
             break;
         default:
             break;
