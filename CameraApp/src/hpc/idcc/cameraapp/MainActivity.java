@@ -1,20 +1,31 @@
 package hpc.idcc.cameraapp;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener {
 
-    private Button mButtonIntent;
-
+    private final static int AR_IMAGE_FROM_CAMERA = 1;
+    
+    private Button mButtonViaIntent;
+    private Uri cameraOutputUri;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mButtonIntent = (Button) findViewById(R.id.main_button_intent);
+        mButtonViaIntent = (Button) findViewById(R.id.main_button_intent);
+        mButtonViaIntent.setOnClickListener(this);
     }
 
     @Override
@@ -24,4 +35,40 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+        case AR_IMAGE_FROM_CAMERA:
+            if (resultCode == RESULT_OK) {
+                if (cameraOutputUri != null)
+                    Toast.makeText(this, "saved photo in: " + cameraOutputUri.getPath(), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Oops! Some errors occur!!", Toast.LENGTH_LONG).show();
+            }
+            break;
+
+        default:
+            break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+    
+    @Override
+    public void onClick(View v) {
+        Intent intent = null;
+        switch (v.getId()) {
+        case R.id.main_button_intent:
+            intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            cameraOutputUri = PictureFiles.getOutputMediaFileUri(
+                    PictureFiles.MEDIA_TYPE_IMAGE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraOutputUri);
+            break;
+        default:
+            break;
+        }
+
+        if (intent != null) {
+            startActivityForResult(intent, AR_IMAGE_FROM_CAMERA);
+        }
+    }
 }
