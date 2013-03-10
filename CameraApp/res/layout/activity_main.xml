@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity" >
 
 	<Button
@@ -11,4 +12,10 @@
 	    android:text="@string/hint_camera_via_intent"
 	    />
 
+	<Button
+	    android:id="@+id/main_button_camera_feature"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/hint_camera_feature"
+	    />
 </LinearLayout>

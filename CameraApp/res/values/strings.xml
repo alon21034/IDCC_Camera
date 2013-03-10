@@ -5,5 +5,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
 
-    <string name="hint_camera_via_intent"></string>
+    <string name="hint_camera_via_intent">Camera via Intent</string>
+    <string name="hint_camera_feature">Camera preview</string>
+    <string name="switch_cam">Switch Camera</string>
+    <string name="camera_alert">Camera Alert</string>
 </resources>
