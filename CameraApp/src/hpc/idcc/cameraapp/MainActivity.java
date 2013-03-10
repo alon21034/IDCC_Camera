@@ -67,7 +67,7 @@ public class MainActivity extends Activity implements OnClickListener {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraOutputUri);
             break;
         case R.id.main_button_camera_feature:
-            intent = new Intent(this, CameraPreview.class);
+            intent = new Intent(this, CameraPreviewActivity.class);
             break;
         default:
             break;

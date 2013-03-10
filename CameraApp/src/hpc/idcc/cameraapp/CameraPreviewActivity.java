@@ -16,27 +16,39 @@
 
 package hpc.idcc.cameraapp;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 // ----------------------------------------------------------------------
 
-public class CameraPreview extends Activity {
+public class CameraPreviewActivity extends Activity implements OnClickListener {
     private CameraPreviewSurfaceView mPreview;
-    Camera mCamera;
-    int numberOfCameras;
-    int cameraCurrentlyLocked;
+    private Camera mCamera;
+    private int numberOfCameras;
+    private int cameraCurrentlyLocked;
 
     // The first rear facing camera
-    int defaultCameraId;
+    private int defaultCameraId;
+    
+    private ImageView imageviewTakePhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +63,9 @@ public class CameraPreview extends Activity {
         setContentView(R.layout.activity_camera_preview);
         mPreview = (CameraPreviewSurfaceView) findViewById(R.id.camera_preview_surfaceview);
 
+        imageviewTakePhoto = (ImageView) findViewById(R.id.camera_preview_take_photo);
+        imageviewTakePhoto.setOnClickListener(this);
+        
         // Find the total number of cameras available
         numberOfCameras = Camera.getNumberOfCameras();
 
@@ -133,6 +148,41 @@ public class CameraPreview extends Activity {
             return true;
         default:
             return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private PictureCallback mPicture = new PictureCallback() {
+
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+
+            File pictureFile = PictureFiles.getOutputMediaFile(PictureFiles.MEDIA_TYPE_IMAGE);
+            if (pictureFile == null){
+                return;
+            }
+
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(data);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                // (TODO) handle file not found error.
+            } catch (IOException e) {
+                // (TODO) handle accessing file error.
+            }
+        }
+    };
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+        case R.id.camera_preview_take_photo:
+            if (mCamera != null)
+                mCamera.takePicture(null, null, mPicture);
+            break;
+
+        default:
+            break;
         }
     }
 }
