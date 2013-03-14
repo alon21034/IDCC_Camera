@@ -24,7 +24,6 @@ import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -73,15 +72,13 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
         
         // Find the total number of cameras available
         numberOfCameras = Camera.getNumberOfCameras();
-
-        // Find the ID of the default camera
-        CameraInfo cameraInfo = new CameraInfo();
-            for (int i = 0; i < numberOfCameras; i++) {
-                Camera.getCameraInfo(i, cameraInfo);
-                if (cameraInfo.facing == CameraInfo.CAMERA_FACING_BACK) {
-                    defaultCameraId = i;
-                }
-            }
+        
+        if (numberOfCameras < 1) {
+            Toast.makeText(this, "sorry, no camera", Toast.LENGTH_SHORT).show();
+            finish();
+        } 
+            
+        defaultCameraId = 0;
     }
 
     @Override
@@ -89,7 +86,7 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
         super.onResume();
 
         // Open the default i.e. the first rear facing camera.
-        mCamera = Camera.open();
+        mCamera = Camera.open(defaultCameraId);
         cameraCurrentlyLocked = defaultCameraId;
         mPreview.setCamera(mCamera);
     }
