@@ -16,18 +16,13 @@
 
 package hpc.idcc.cameraapp;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
+import hpc.idcc.cameraapp.SavePhotoAsyncTask.SavePhotoListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,10 +31,11 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 // ----------------------------------------------------------------------
 
-public class CameraPreviewActivity extends Activity implements OnClickListener {
+public class CameraPreviewActivity extends Activity implements OnClickListener, SavePhotoListener  {
     private CameraPreviewSurfaceView mPreview;
     private Camera mCamera;
     private int numberOfCameras;
@@ -47,9 +43,12 @@ public class CameraPreviewActivity extends Activity implements OnClickListener {
 
     // The first rear facing camera
     private int defaultCameraId;
-    
-    private ImageView imageviewTakePhoto;
 
+    private ImageView mConfirmButton;
+    private ImageView mCancelButton;
+    private ImageView imageviewTakePhoto;
+    private byte[] mPhotoData;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +64,12 @@ public class CameraPreviewActivity extends Activity implements OnClickListener {
 
         imageviewTakePhoto = (ImageView) findViewById(R.id.camera_preview_take_photo);
         imageviewTakePhoto.setOnClickListener(this);
+        
+        mConfirmButton = (ImageView) findViewById(R.id.camera_preview_confirm);
+        mConfirmButton.setOnClickListener(this);
+        
+        mCancelButton = (ImageView) findViewById(R.id.camera_preview_cancel);
+        mCancelButton.setOnClickListener(this);
         
         // Find the total number of cameras available
         numberOfCameras = Camera.getNumberOfCameras();
@@ -106,9 +111,7 @@ public class CameraPreviewActivity extends Activity implements OnClickListener {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         // Inflate our menu which can gather user input for switching camera
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.camera_menu, menu);
-        return true;
+        return false;
     }
 
     @Override
@@ -141,7 +144,6 @@ public class CameraPreviewActivity extends Activity implements OnClickListener {
                     .open((cameraCurrentlyLocked + 1) % numberOfCameras);
             cameraCurrentlyLocked = (cameraCurrentlyLocked + 1)
                     % numberOfCameras;
-            mPreview.switchCamera(mCamera);
 
             // Start the preview
             mCamera.startPreview();
@@ -155,21 +157,9 @@ public class CameraPreviewActivity extends Activity implements OnClickListener {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
-            File pictureFile = PictureFiles.getOutputMediaFile(PictureFiles.MEDIA_TYPE_IMAGE);
-            if (pictureFile == null){
-                return;
-            }
-
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                // (TODO) handle file not found error.
-            } catch (IOException e) {
-                // (TODO) handle accessing file error.
-            }
+            mPhotoData = data;
+            mConfirmButton.setVisibility(View.VISIBLE);
+            mCancelButton.setVisibility(View.VISIBLE);
         }
     };
 
@@ -180,9 +170,29 @@ public class CameraPreviewActivity extends Activity implements OnClickListener {
             if (mCamera != null)
                 mCamera.takePicture(null, null, mPicture);
             break;
-
+        case R.id.camera_preview_confirm:
+            SavePhotoAsyncTask mAsyncTask = new SavePhotoAsyncTask(this);
+            mAsyncTask.execute(mPhotoData);
+            break;
+        case R.id.camera_preview_cancel:
+            mPhotoData = null;
+            mConfirmButton.setVisibility(View.GONE);
+            mCancelButton.setVisibility(View.GONE);
+            finish();
+            break;
         default:
             break;
         }
+    }
+
+    @Override
+    public void onSaveFinish(Throwable e) {
+        if (e == null) {
+            setResult(RESULT_OK);
+        } else {
+            setResult(RESULT_CANCELED);
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+        }
+        finish();
     }
 }

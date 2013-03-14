@@ -13,10 +13,9 @@ import android.view.SurfaceView;
 
 public class CameraPreviewSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     
-    SurfaceHolder mHolder;
-    Size mPreviewSize;
-    List<Size> mSupportedPreviewSizes;
-    Camera mCamera;
+    private SurfaceHolder mHolder;
+    private final String TAG = "Preview";
+    private Camera mCamera;
 
     public CameraPreviewSurfaceView(Context context, AttributeSet attrs,
             int defStyle) {
@@ -33,9 +32,6 @@ public class CameraPreviewSurfaceView extends SurfaceView implements SurfaceHold
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
-    private final String TAG = "Preview";
-
-
     public CameraPreviewSurfaceView(Context context) {
         super(context);
 
@@ -49,23 +45,8 @@ public class CameraPreviewSurfaceView extends SurfaceView implements SurfaceHold
     public void setCamera(Camera camera) {
         mCamera = camera;
         if (mCamera != null) {
-            mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
             requestLayout();
         }
-    }
-
-    public void switchCamera(Camera camera) {
-       setCamera(camera);
-       try {
-           camera.setPreviewDisplay(mHolder);
-       } catch (IOException exception) {
-           Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
-       }
-       Camera.Parameters parameters = camera.getParameters();
-       parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-       requestLayout();
-
-       camera.setParameters(parameters);
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
