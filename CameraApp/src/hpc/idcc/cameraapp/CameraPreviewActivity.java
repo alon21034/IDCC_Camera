@@ -20,7 +20,6 @@ import hpc.idcc.cameraapp.SavePhotoAsyncTask.SavePhotoListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.view.Menu;
@@ -175,8 +174,7 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
             mPhotoData = null;
             mConfirmButton.setVisibility(View.GONE);
             mCancelButton.setVisibility(View.GONE);
-            finish();
-            break;
+            mCamera.startPreview();
         default:
             break;
         }

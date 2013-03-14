@@ -1,11 +1,9 @@
 package hpc.idcc.cameraapp;
 
 import java.io.IOException;
-import java.util.List;
 
 import android.content.Context;
 import android.hardware.Camera;
-import android.hardware.Camera.Size;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -84,6 +82,7 @@ public class CameraPreviewSurfaceView extends SurfaceView implements SurfaceHold
 
         // start preview with new settings
         try {
+            mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
