@@ -19,9 +19,13 @@ package hpc.idcc.cameraapp;
 import hpc.idcc.cameraapp.SavePhotoAsyncTask.SavePhotoListener;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +50,7 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
     private ImageView mCancelButton;
     private ImageView imageviewTakePhoto;
     private byte[] mPhotoData;
+    private String fileUri;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,11 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        fileUri = ((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT)).toString();
+        if (TextUtils.isEmpty(fileUri)) {
+            fileUri = PictureFiles.getOutputMediaFile(PictureFiles.MEDIA_TYPE_IMAGE).getPath();
+        }
+        
         // Create a RelativeLayout container that will hold a SurfaceView,
         // and set it as the content of our activity.
         setContentView(R.layout.activity_camera_preview);
@@ -167,7 +177,8 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
                 mCamera.takePicture(null, null, mPicture);
             break;
         case R.id.camera_preview_confirm:
-            SavePhotoAsyncTask mAsyncTask = new SavePhotoAsyncTask(this);
+            SavePhotoAsyncTask mAsyncTask = new SavePhotoAsyncTask(this, 
+                    Uri.parse(fileUri));
             mAsyncTask.execute(mPhotoData);
             break;
         case R.id.camera_preview_cancel:
@@ -181,11 +192,14 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
     }
 
     @Override
-    public void onSaveFinish(Throwable e) {
+    public void onSaveFinish(Throwable e, Uri uri) {
+        Intent intent = new Intent();
         if (e == null) {
-            setResult(RESULT_OK);
+            intent.setData(uri);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            setResult(RESULT_OK, intent);
         } else {
-            setResult(RESULT_CANCELED);
+            setResult(RESULT_CANCELED, intent);
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
         finish();

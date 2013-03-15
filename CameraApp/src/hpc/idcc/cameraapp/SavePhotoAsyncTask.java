@@ -1,20 +1,25 @@
 package hpc.idcc.cameraapp;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 public class SavePhotoAsyncTask extends AsyncTask<byte[], Void, Throwable> {
 
     private ProgressDialog mDialog;
+    private Context ctx;
     private SavePhotoListener mListener;
+    private Uri mUri;
     
-    public SavePhotoAsyncTask(CameraPreviewActivity activity) {
+    public SavePhotoAsyncTask(CameraPreviewActivity activity, Uri uri) {
         mListener = activity;
+        ctx = activity;
+        mUri = uri;
         mDialog = ProgressDialog.show(activity, null, "saving...");
     }
     
@@ -25,9 +30,9 @@ public class SavePhotoAsyncTask extends AsyncTask<byte[], Void, Throwable> {
     
     @Override
     protected Exception doInBackground(byte[]... params) {
-        File pictureFile = PictureFiles.getOutputMediaFile(PictureFiles.MEDIA_TYPE_IMAGE);
-        if (pictureFile == null){
-            return new NullPointerException("pictureFile is null");
+        if (mUri == null) {
+            mUri = Uri.parse(PictureFiles.getOutputMediaFile(PictureFiles.MEDIA_TYPE_IMAGE).getPath());
+            return new IOException("file is null");
         }
         
         if (params == null || params[0] == null) {
@@ -35,7 +40,7 @@ public class SavePhotoAsyncTask extends AsyncTask<byte[], Void, Throwable> {
         }
         
         try {
-            FileOutputStream fos = new FileOutputStream(pictureFile);
+            OutputStream fos = ctx.getContentResolver().openOutputStream(mUri);
             fos.write(params[0]);
             fos.close();
         } catch (FileNotFoundException e) {
@@ -50,10 +55,13 @@ public class SavePhotoAsyncTask extends AsyncTask<byte[], Void, Throwable> {
     protected void onPostExecute(Throwable result) {
         super.onPostExecute(result);
         mDialog.cancel();
-        mListener.onSaveFinish(result);
+        if (result == null)
+            mListener.onSaveFinish(result, mUri);
+        else 
+            mListener.onSaveFinish(result, null);
     }
     
     public interface SavePhotoListener {
-        public void onSaveFinish(Throwable e);
+        public void onSaveFinish(Throwable e, Uri uri);
     }
 }
