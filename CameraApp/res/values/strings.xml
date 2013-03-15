@@ -9,4 +9,5 @@
     <string name="hint_camera_feature">Camera preview</string>
     <string name="switch_cam">Switch Camera</string>
     <string name="camera_alert">Camera Alert</string>
+    <string name="hint_default_folder">Camera via Intent(saved in default folder)</string>
 </resources>
