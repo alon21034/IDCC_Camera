@@ -60,8 +60,12 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        fileUri = ((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT)).toString();
-        if (TextUtils.isEmpty(fileUri)) {
+        
+        Uri uri = ((Uri) getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT));
+        
+        if (uri != null) {
+            fileUri = uri.toString();
+        } else {
             fileUri = PictureFiles.getOutputMediaFile(PictureFiles.MEDIA_TYPE_IMAGE).getPath();
         }
         
