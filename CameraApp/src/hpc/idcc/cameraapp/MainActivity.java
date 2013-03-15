@@ -45,9 +45,11 @@ public class MainActivity extends Activity implements OnClickListener {
         case AR_IMAGE_FROM_CAMERA:
             if (resultCode == RESULT_OK) {
                 if (cameraOutputUri != null)
-                    Toast.makeText(this, "saved photo in: " + cameraOutputUri.getPath(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "saved photo in: " + cameraOutputUri.getPath(), 
+                            Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "Oops! Some errors occur!! (camera via intent)", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Oops! Some errors occur!! (camera via intent)", 
+                        Toast.LENGTH_LONG).show();
             }
             break;
         case AR_IMAGE_FROM_CAMERA_PREVIEW:
