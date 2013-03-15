@@ -20,12 +20,12 @@ public class SavePhotoAsyncTask extends AsyncTask<byte[], Void, Throwable> {
         mListener = activity;
         ctx = activity;
         mUri = uri;
-        mDialog = ProgressDialog.show(activity, null, "saving...");
     }
     
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        mDialog = ProgressDialog.show(ctx, null, "saving...");
     }
     
     @Override
