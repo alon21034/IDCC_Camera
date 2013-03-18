@@ -200,7 +200,9 @@ public class CameraPreviewActivity extends Activity implements OnClickListener, 
         Intent intent = new Intent();
         if (e == null) {
             intent.setData(uri);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            // Bundle bundle = new Bundle();
+            // bundle.putByteArray("data", getBitmap());
+            // intent.putExtras(bundle);
             setResult(RESULT_OK, intent);
         } else {
             setResult(RESULT_CANCELED, intent);
